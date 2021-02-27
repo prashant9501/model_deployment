@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.externals import joblib
+# from sklearn.externals import joblib
 
 app = Flask(__name__)
 
@@ -14,20 +14,18 @@ def home():
 @app.route('/predict',methods=['POST'])
 def predict_fun():
 	
-    NB_spam_model = open('NB_spam_model.pkl','rb')
-    clf = joblib.load(NB_spam_model)
-    
-    cv_model = open('cv.pkl', 'rb')
-    cv = joblib.load(cv_model)
-    
+    clf = pickle.load(open('NB_spam_model.pkl','rb'))    
+    cv = pickle.load(open('cv.pkl','rb'))
+
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
         vect = cv.transform(data).toarray()
         my_prediction = clf.predict(vect)
+        print(my_prediction)
 	
     return render_template('result.html',prediction = my_prediction)
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=False, port=4000)
